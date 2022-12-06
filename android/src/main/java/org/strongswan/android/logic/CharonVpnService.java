@@ -610,18 +610,36 @@ public class CharonVpnService extends VpnService implements Runnable, VpnStateSe
         TrustedCertificateManager certman = TrustedCertificateManager.getInstance().load();
         try {
             String alias = this.mCurrentCertificateAlias;
-            if (alias != null) {
-                X509Certificate cert = certman.getCACertificateFromAlias(alias);
+
+            /// this method requires install certificate (ex: pem file)
+            // if (alias != null) {
+            //     X509Certificate cert = certman.getCACertificateFromAlias(alias);
+            //     if (cert == null) {
+            //         return null;
+            //     }
+            //     certs.add(cert.getEncoded());
+            // } else {
+            //     for (X509Certificate cert : certman.getAllCACertificates().values()) {
+            //         certs.add(cert.getEncoded());
+            //     }
+            // }
+
+            // my way can use to generate cert from pem file
+            try ( InputStream inStream = new ByteArrayInputStream(mCurrentProfile.getCertificateString().getBytes())) {
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                X509Certificate cert = (X509Certificate)cf.generateCertificate(inStream);
                 if (cert == null) {
                     return null;
                 }
                 certs.add(cert.getEncoded());
-            } else {
-                for (X509Certificate cert : certman.getAllCACertificates().values()) {
-                    certs.add(cert.getEncoded());
-                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (CertificateException e) {
+                e.printStackTrace();
             }
-        } catch (CertificateEncodingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

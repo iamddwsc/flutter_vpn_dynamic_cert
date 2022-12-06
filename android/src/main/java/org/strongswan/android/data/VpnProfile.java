@@ -38,7 +38,7 @@ public class VpnProfile implements Cloneable
 	public static final int FLAGS_RSA_PSS = 1 << 4;
 	public static final int FLAGS_IPv6_TRANSPORT = 1 << 5;
 
-	private String mName, mGateway, mUsername, mPassword, mCertificate, mUserCertificate;
+	private String mName, mGateway, mUsername, mPassword, mCertificate, mUserCertificate, mCertificateString;
 	private String mRemoteId, mLocalId, mExcludedSubnets, mIncludedSubnets, mSelectedApps;
 	private String mIkeProposal, mEspProposal, mDnsServers;
 	private Integer mMTU, mPort, mSplitTunneling, mNATKeepAlive, mFlags;
@@ -327,6 +327,14 @@ public class VpnProfile implements Cloneable
 	public void setFlags(Integer flags)
 	{
 		this.mFlags = flags;
+	}
+
+	public String getCertificateString() {
+		return mCertificateString;
+	}
+
+	public void setCertificateString(String cert) {
+		this.mCertificateString = cert;
 	}
 
 	@Override
