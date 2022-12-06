@@ -16,6 +16,10 @@ The iOS part was implemented by NEVPNManager.
 
 Issues and PRs are welcome!
 
+## From iamddwsc
+I added a parameter to pass in a String (from .pem file).
+Pass data in and the connection will be established.
+
 ## Installation
 
 ### For Android
