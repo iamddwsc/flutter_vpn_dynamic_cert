@@ -53,9 +53,11 @@ import org.strongswan.android.utils.IPRangeSet;
 import org.strongswan.android.utils.SettingsWriter;
 import org.strongswan.android.utils.Utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -64,6 +66,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -157,6 +161,7 @@ public class CharonVpnService extends VpnService implements Runnable, VpnStateSe
                     profile.setLocalId(bundle.getString("LocalId"));
                     profile.setRemoteId(bundle.getString("RemoteId"));
                     profile.setVpnType(VpnType.fromIdentifier(bundle.getString("VpnType")));
+                    profile.setCertificateString(bundle.getString("CertificateString"));
 
                     profile.setSelectedAppsHandling(SelectedAppsHandling.SELECTED_APPS_DISABLE);
                     profile.setFlags(0);
@@ -609,36 +614,35 @@ public class CharonVpnService extends VpnService implements Runnable, VpnStateSe
         ArrayList<byte[]> certs = new ArrayList<byte[]>();
         TrustedCertificateManager certman = TrustedCertificateManager.getInstance().load();
         try {
-            String alias = this.mCurrentCertificateAlias;
-
-            /// this method requires install certificate (ex: pem file)
-            // if (alias != null) {
-            //     X509Certificate cert = certman.getCACertificateFromAlias(alias);
-            //     if (cert == null) {
-            //         return null;
-            //     }
-            //     certs.add(cert.getEncoded());
-            // } else {
-            //     for (X509Certificate cert : certman.getAllCACertificates().values()) {
-            //         certs.add(cert.getEncoded());
-            //     }
-            // }
-
+//            String alias = this.mCurrentCertificateAlias;
+            String certString = this.mCurrentProfile.getCertificateString();
             // my way can use to generate cert from pem file
-            try ( InputStream inStream = new ByteArrayInputStream(mCurrentProfile.getCertificateString().getBytes())) {
-                CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                X509Certificate cert = (X509Certificate)cf.generateCertificate(inStream);
-                if (cert == null) {
-                    return null;
+            if (certString != null) {
+                try ( InputStream inStream = new ByteArrayInputStream(certString.getBytes())) {
+                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                    X509Certificate cert = (X509Certificate)cf.generateCertificate(inStream);
+                    if (cert == null) {
+                        return null;
+                    }
+                    certs.add(cert.getEncoded());
+                } catch (CertificateException e) {
+                    e.printStackTrace();
                 }
-                certs.add(cert.getEncoded());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (CertificateException e) {
-                e.printStackTrace();
+            } else {
+                // this method requires install certificate (ex: pem file)
+                if (alias != null) {
+                    X509Certificate cert = certman.getCACertificateFromAlias(alias);
+                    if (cert == null) {
+                        return null;
+                    }
+                    certs.add(cert.getEncoded());
+                } else {
+                    for (X509Certificate cert : certman.getAllCACertificates().values()) {
+                        certs.add(cert.getEncoded());
+                    }
+                }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             return null;
