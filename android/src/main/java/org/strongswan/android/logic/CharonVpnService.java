@@ -614,7 +614,7 @@ public class CharonVpnService extends VpnService implements Runnable, VpnStateSe
         ArrayList<byte[]> certs = new ArrayList<byte[]>();
         TrustedCertificateManager certman = TrustedCertificateManager.getInstance().load();
         try {
-//            String alias = this.mCurrentCertificateAlias;
+            String alias = this.mCurrentCertificateAlias;
             String certString = this.mCurrentProfile.getCertificateString();
             // my way can use to generate cert from pem file
             if (certString != null) {
