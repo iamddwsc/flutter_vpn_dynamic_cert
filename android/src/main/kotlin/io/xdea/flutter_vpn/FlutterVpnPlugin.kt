@@ -79,8 +79,8 @@ class FlutterVpnPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-        channel.setMethodCallHandler(null)
-        eventChannel.setStreamHandler(null)
+//        channel.setMethodCallHandler(null)
+//        eventChannel.setStreamHandler(null)
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {

@@ -17,15 +17,18 @@ class FlutterVpn {
   ///
   /// Can only be listened once. If have more than one subscription, only the
   /// last subscription can receive events.
-  static Stream<FlutterVpnState> get onStateChanged => FlutterVpnPlatform.instance.onStateChanged;
+  static Stream<FlutterVpnState> get onStateChanged =>
+      FlutterVpnPlatform.instance.onStateChanged;
 
   /// Get current state.
-  static Future<FlutterVpnState> get currentState => FlutterVpnPlatform.instance.currentState;
+  static Future<FlutterVpnState> get currentState =>
+      FlutterVpnPlatform.instance.currentState;
 
   /// Get current error state from `VpnStateService`. (Android only)
   /// When [FlutterVpnState.error] is received, details of error can be
   /// inspected by [CharonErrorState]. Returns [null] on non-android platform.
-  static Future<CharonErrorState?> get charonErrorState => FlutterVpnPlatform.instance.charonErrorState;
+  static Future<CharonErrorState?> get charonErrorState =>
+      FlutterVpnPlatform.instance.charonErrorState;
 
   /// Prepare for vpn connection. (Android only)
   ///
